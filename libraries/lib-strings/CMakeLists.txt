@@ -28,7 +28,7 @@ set( SOURCES
 )
 set( LIBRARIES
    PRIVATE
-   wxBase
+   ${wxWidgets_LIBRARIES}
 )
 audacity_library( lib-strings "${SOURCES}" "${LIBRARIES}"
    "" ""

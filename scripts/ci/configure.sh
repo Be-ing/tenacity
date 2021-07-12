@@ -9,8 +9,6 @@ fi
 
 set -euxo pipefail
 
-conan --version # check it works
-
 cmake_args=(
     -S .
     -B build
@@ -49,5 +47,3 @@ fi
 # Configure Audacity
 cmake "${cmake_args[@]}"
 
-# Remove build directories and sources to reduce the cache size.
-conan remove "*" --src --builds --force

@@ -23,7 +23,7 @@ if( GIT_FOUND )
       COMMAND
          ${CMAKE_COMMAND} -D GIT="${GIT_EXECUTABLE}"
                           -D "_PRVDIR=${_PRVDIR}"
-                          -P "${AUDACITY_MODULE_PATH}/Version.cmake"
+                          -P "cmake-proxies/cmake-modules/Version.cmake"
       WORKING_DIRECTORY
          ${topdir}
    )
@@ -1016,6 +1016,7 @@ list( APPEND INCLUDES
       ${_PRVDIR}
       ${topdir}/include
       ${TARGET_ROOT}
+      ${wxWidgets_INCLUDES}
 )
 
 #
@@ -1075,32 +1076,34 @@ list( APPEND LIBRARIES
    PUBLIC
       ${CMAKE_REQUIRED_LIBRARIES}
       ZLIB::ZLIB
-      wxwidgets::wxwidgets
+      ${wxWidgets_LIBRARIES}
       expat::expat
-      libmp3lame::libmp3lame
-      libsndfile
-      libsoxr
-      portaudio-v19
-      sqlite
-      $<$<BOOL:${USE_FFMPEG}>:ffmpeg>
-      $<$<BOOL:${USE_LIBID3TAG}>:libid3tag::libid3tag>
-      $<$<BOOL:${USE_LIBFLAC}>:libflac>
-      $<$<BOOL:${USE_LIBMAD}>:libmad::libmad>
-      $<$<BOOL:${USE_LIBOGG}>:libogg>
-      $<$<BOOL:${USE_LIBVORBIS}>:libvorbis>
-      $<$<BOOL:${USE_LIBTWOLAME}>:twolame>
-      $<$<BOOL:${USE_LV2}>:lv2>
-      $<$<BOOL:${USE_MIDI}>:portmidi>
-      $<$<BOOL:${USE_MIDI}>:portsmf>
-      $<$<BOOL:${USE_NYQUIST}>:libnyquist>
+      mp3lame::mp3lame
+      SndFile::sndfile
+      Soxr::soxr
+      PortAudio::PortAudio
+      ${SQLite3_LIBRARIES}
+      $<$<BOOL:${USE_FFMPEG}>:FFMPEG::FFMPEG>
+      $<$<BOOL:${USE_LIBID3TAG}>:ID3Tag::ID3Tag>
+      $<$<BOOL:${USE_LIBFLAC}>:FLAC++::FLAC++>
+      $<$<BOOL:${USE_LIBMAD}>:MAD::MAD>
+      $<$<BOOL:${USE_LIBOGG}>:Ogg::ogg>
+      $<$<BOOL:${USE_LIBVORBIS}>:Vorbis::vorbis>
+      $<$<BOOL:${USE_LIBVORBIS}>:Vorbis::vorbisenc>
+      $<$<BOOL:${USE_LIBVORBIS}>:Vorbis::vorbisfile>
+      $<$<BOOL:${USE_LIBTWOLAME}>:Twolame::Twolame>
+      $<$<BOOL:${USE_LV2}>:lilv::lilv>
+      $<$<BOOL:${USE_LV2}>:suil::suil>
+      $<$<BOOL:${USE_MIDI}>:PortMidi::PortMidi>
+      $<$<BOOL:${USE_MIDI}>:PortSMF::PortSMF>
+      libnyquist
       $<$<BOOL:${USE_PORTMIXER}>:portmixer>
-      $<$<BOOL:${USE_SBSMS}>:libsbsms>
-      $<$<BOOL:${USE_SOUNDTOUCH}>:soundtouch>
-      $<$<BOOL:${USE_VAMP}>:libvamp>
-      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:PkgConfig::GLIB>
-      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:PkgConfig::GTK>
-      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:z>
-      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:pthread>
+      $<$<BOOL:${USE_SBSMS}>:sbsms::sbsms>
+      $<$<BOOL:${USE_SOUNDTOUCH}>:SoundTouch::SoundTouch>
+      $<$<BOOL:${USE_VAMP}>:VampHostSDK::VampHostSDK>
+      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:${GLIB_LIBRARIES}>
+      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:GTK::GTK>
+      $<$<PLATFORM_ID:Linux,FreeBSD,OpenBSD,NetBSD,CYGWIN>:Threads::Threads>
 )
 
 set( BUILDING_AUDACITY YES )
@@ -1113,11 +1116,11 @@ set( HAVE_GTK ${GTK_FOUND} )
 # can be done against ExportMP3.cpp.  If either are defined, the
 # build will fail.
 if( NOT CMAKE_SYSTEM_NAME MATCHES "Windows|Darwin" )
-   if( "${${_OPT}use_lame}" STREQUAL "local" )
+   if( LAME_FOUND )
       set( DISABLE_DYNAMIC_LOADING_LAME YES )
    endif()
 
-   if( "${${_OPT}use_ffmpeg}" STREQUAL "linked" )
+   if( FFMPEG_FOUND )
       set( DISABLE_DYNAMIC_LOADING_FFMPEG YES )
    endif()
 endif()

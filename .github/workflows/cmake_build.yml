@@ -29,10 +29,10 @@ jobs:
       matrix:
         config:
 
-        - name: Ubuntu_18.04
-          os: ubuntu-18.04
+        - name: Ubuntu_20.04
+          os: ubuntu-20.04
           arch: x86_64 # as reported by `arch` or `uname -m`
-          generator: Unix Makefiles
+          generator: Ninja
           compiler_cache: ccache
           compiler_cache_path: ~/.ccache
 
@@ -112,16 +112,15 @@ jobs:
           ${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ github.head_ref }}-
           ${{ matrix.config.os }}-${{ matrix.config.arch }}-
 
-    - name: Cache for .conan
-      id: cache-conan
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-conan-modules
-      with:
-        path: ${{ env.CONAN_USER_HOME }}
-        key: host-${{ matrix.config.name }}-${{ hashFiles('cmake-proxies/CMakeLists.txt') }}
-        restore-keys: |
-          host-${{ matrix.config.name }}-
+    - name: Build wxWidgets
+      if: runner.os == 'Linux'
+      run: |
+        git clone https://github.com/wxWidgets/wxWidgets.git
+        cd wxWidgets
+        git checkout v3.1.5
+        cmake -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -S . -B cbuild
+        cmake --build cbuild --parallel `nproc`
+        sudo cmake --install cbuild
 
       # Install scdoc with conan TODO: Move conan pkg to own repo
     - name: "[Linux] Install scdoc"
@@ -153,11 +152,13 @@ jobs:
         exec bash "scripts/ci/install.sh"
 
     - name: Package
+      if: runner.os != 'Linux'
       run: |
         exec bash "scripts/ci/package.sh"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
+      if: runner.os != 'Linux'
       with:
         name: Tenacity_${{ matrix.config.name }}_${{ github.run_id }}_${{ env.GIT_HASH_SHORT }}
         path: |

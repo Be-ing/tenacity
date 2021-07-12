@@ -42,9 +42,39 @@ else # Linux & others
             # Docker image
             file
             g++
+            ninja-build
             git
             wget
             bash
+
+            # Dependencies
+            debhelper-compat
+            gettext
+            libasound2-dev
+            libavcodec-dev
+            libavformat-dev
+            libavutil-dev
+            libexpat1-dev
+            libflac++-dev
+            libgtk-3-dev
+            libid3tag0-dev
+            libjack-dev
+            liblilv-dev
+            libmad0-dev
+            libmp3lame-dev
+            libogg-dev
+            libportmidi-dev
+            libportsmf-dev
+            libsndfile1-dev
+            libsoundtouch-dev
+            libsoxr-dev
+            libsuil-dev
+            libtwolame-dev
+            libvorbis-dev
+            libwxgtk3.0-gtk3-dev
+            lv2-dev
+            portaudio19-dev
+            vamp-plugin-sdk
 
             # GitHub Actions
             libasound2-dev
@@ -62,5 +92,4 @@ else # Linux & others
         echo >&2 "$0: Error: You don't have a recognized package manager installed."
         exit 1
     fi
-
 fi

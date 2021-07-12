@@ -102,6 +102,7 @@ set( CMAKE_MODULE_PATH
    ${AUDACITY_MODULE_PATH}
    ${CMAKE_BINARY_DIR}
    ${CMAKE_MODULE_PATH}
+   "${CMAKE_SOURCE_DIR}/cmake-modules"
 )
 
 set( CMAKE_PREFIX_PATH
@@ -151,21 +152,6 @@ project( Tenacity )
 include( AudacityFunctions )
 
 set_from_env(AUDACITY_ARCH_LABEL) # e.g. x86_64
-
-# Allow user to globally set the library preference
-cmd_option( ${_OPT}lib_preference
-            "Library preference [system (if available), local]"
-            "local"
-            STRINGS "system" "local"
-)
-
-# Special mode, that will force dependencies to the packages provided by system unless they were set to local explicitly.
-cmd_option( ${_OPT}obey_system_dependencies
-            "Use system packages to satisfy dependencies"
-            Off
-)
-
-include( AudacityDependencies )
 
 # Pull all the modules we'll need
 include( CheckCXXCompilerFlag )
@@ -499,25 +485,105 @@ endif()
 set( AUDACITY_DIST_VERSION ${AUDACITY_VERSION}.${AUDACITY_RELEASE}.${AUDACITY_REVISION} )
 set( AUDACITY_INFO_VERSION ${AUDACITY_VERSION}.${AUDACITY_RELEASE}.${AUDACITY_REVISION}.${AUDACITY_MODLEVEL} )
 
-# Python is used for the manual and (possibly) message catalogs
-find_package( Python3 )
-if( Python3_FOUND )
-   set( PYTHON "${Python3_EXECUTABLE}" )
-elseif( CMAKE_SYSTEM_NAME MATCHES "Windows" )
-   # This is an odd case now, as Conan requires Python as well
-   nuget_package( pkgdir "python3" "3.7.7" )
-   file( TO_NATIVE_PATH "${pkgdir}/tools/python.exe" PYTHON )
-endif()
-
 # define EXPERIMENTAL flags
 # Do this before consistency checks for added third-party libraries
 include( "src/Experimental.cmake" )
 
-# Add our children
-add_subdirectory( "cmake-proxies" )
+find_package(Threads REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(expat REQUIRED)
+find_package(mp3lame REQUIRED)
+find_package(SndFile REQUIRED)
+find_package(Soxr REQUIRED)
+find_package(SQLite3 REQUIRED)
+find_package(PortAudio REQUIRED)
 
-# Conan uses find_package and does not set GLOBAL flag
-resolve_conan_dependencies()
+find_package(PortMidi REQUIRED)
+if(PortMidi_FOUND)
+    set(USE_MIDI ON)
+    find_package(PortSMF REQUIRED)
+endif()
+
+find_package(ID3Tag)
+if(ID3Tag_FOUND)
+    set(USE_LIBID3TAG ON)
+endif()
+
+find_package(MAD)
+if(MAD_FOUND)
+    set(USE_LIBMAD ON)
+endif()
+
+find_package(Twolame)
+if(Twolame_FOUND)
+    set(USE_LIBTWOLAME ON)
+endif()
+
+find_package(LV2)
+if(LV2_FOUND)
+    set(USE_LV2 ON)
+endif()
+
+find_package(Ogg)
+if(Ogg_FOUND)
+    set(USE_LIBOGG ON)
+endif()
+
+find_package(Vorbis)
+if(Vorbis_FOUND)
+    set(USE_LIBVORBIS ON)
+endif()
+
+find_package(FLAC++)
+if(FLAC++_FOUND)
+    set(USE_LIBFLAC ON)
+endif()
+
+# FIXME: requires vendored fork of PortMixer which requires vendored fork of PortAudio
+# https://github.com/audacity/audacity/issues/840#issuecomment-837795388
+#find_package(PortMixer)
+#if(PortMixer_FOUND)
+    #set(USE_PORTMIXER ON)
+#endif()
+
+find_package(sbsms)
+if(sbsms_FOUND)
+    set(USE_SBSMS ON)
+endif()
+
+find_package(SoundTouch)
+if(SoundTouch_FOUND)
+    set(USE_SOUNDTOUCH ON)
+endif()
+
+find_package(FFMPEG)
+if(FFMPEG_FOUND)
+    set(USE_FFMPEG ON)
+endif()
+
+find_package(VampHostSDK)
+if(VampHostSDK_FOUND)
+    set(USE_VAMP ON)
+endif()
+
+find_package(LV2)
+find_package(lilv)
+find_package(suil)
+if(LV2_FOUND AND lilv_FOUND AND suil_FOUND)
+    set(USE_LV2 ON)
+endif()
+
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
+    find_package(GLIB REQUIRED)
+    find_package(GTK 3.0 REQUIRED)
+endif()
+
+set(wxWidgets_CONFIG_OPTIONS --version=3.1)
+find_package(unofficial-wxwidgets REQUIRED COMPONENTS adv base core html qa xml net)
+#include(${wxWidgets_USE_FILE})
+
+add_subdirectory(lib-src/libnyquist)
+set(USE_NYQUIST ON)
 
 add_subdirectory( "help" )
 add_subdirectory( "images" )
