@@ -23,7 +23,7 @@ export CMAKE_BUILD_PARALLEL_LEVEL=$(( ${cpus} > 2 ? $((${cpus} - 2)) : ${cpus} )
 echo "Using ${CMAKE_BUILD_PARALLEL_LEVEL} processors for cmake build"
 
 # Build Audacity
-cmake --build build --config "${AUDACITY_BUILD_TYPE}"
+cmake --build build --config "${AUDACITY_BUILD_TYPE}" -v
 
 BIN_OUTPUT_DIR=build/bin/${AUDACITY_BUILD_TYPE}
 SYMBOLS_OUTPUT_DIR=debug

@@ -2,8 +2,6 @@ name: CMake Build
 
 on:
   push:
-    branches:
-      - master
   pull_request:
 
 defaults:
