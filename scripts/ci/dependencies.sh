@@ -11,7 +11,6 @@ if [[ "${OSTYPE}" == msys* ]]; then # Windows
         # Chocolatey packages
         choco_packages=(
             sccache
-            conan
         )
 
         choco install "${choco_packages[@]}" -y
@@ -25,8 +24,14 @@ elif [[ "${OSTYPE}" == darwin* ]]; then # macOS
     # Homebrew packages
     brew_packages=(
         bash # macOS ships with Bash v3 for licensing reasons so upgrade it now
-        conan
         ccache
+        ninja
+
+        # needed to build ffmpeg
+        nasm
+
+        # FIXME: remove when wxwidgets port in vcpkg is fixed
+        wxwidgets
     )
     brew install "${brew_packages[@]}"
 
@@ -39,28 +44,35 @@ else # Linux & others
     # Distribution packages
     if which apt-get; then
         apt_packages=(
-            # Docker image
+            # Build tools
             file
             g++
+            ninja-build
+            nasm
             git
             wget
             bash
+            scdoc
+            ccache
+
+            # Dependencies
+            debhelper-compat
+            gettext
+            libasound2-dev
+            libgtk-3-dev
+            # TODO: package in vcpkg
+            libtwolame-dev
+            libsuil-dev
+            # FIXME: vamp-sdk host's SSL certificate is bad, cannot download in vcpkg
+            libvamp-hostsdk3v5
 
             # GitHub Actions
-            libasound2-dev
-            libgtk2.0-dev
             gettext
-            ccache
         )
         sudo apt-get update -y
         sudo apt-get install -y --no-install-recommends "${apt_packages[@]}"
-
-        # Download Conan from github
-        wget "https://github.com/conan-io/conan/releases/latest/download/conan-ubuntu-64.deb" -nv -O /tmp/conan.deb
-        sudo dpkg -i /tmp/conan.deb
     else
         echo >&2 "$0: Error: You don't have a recognized package manager installed."
         exit 1
     fi
-
 fi
