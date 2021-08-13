@@ -69,7 +69,7 @@ jobs:
           exe_suffix: .exe
 
     env:
-      CMAKE_BUILD_TYPE: RelWithDebInfo
+      CMAKE_BUILD_TYPE: Debug
       CMAKE_C_COMPILER_LAUNCHER: ${{ matrix.config.os.compiler_cache }}
       CMAKE_CXX_COMPILER_LAUNCHER: ${{ matrix.config.os.compiler_cache }}
       CMAKE_OSX_DEPLOYMENT_TARGET: 10.9
