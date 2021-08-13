@@ -1033,6 +1033,8 @@ list( APPEND DEFINES
    PRIVATE
       BUILDING_AUDACITY
       WXUSINGDLL
+      ${wxWidgets_DEFINITIONS}
+      $<$<CONFIG:Debug>:${wxWidgets_DEFINITIONS_DEBUG}>
       CMAKE
       $<$<BOOL:${HAVE_LRINT}>:
          HAVE_LRINT
