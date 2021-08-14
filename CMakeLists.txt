@@ -690,20 +690,22 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
 
 endif()
 
-set(wxWidgets_CONFIG_OPTIONS --version=3.1)
-if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(wxWidgets_CONFIGURATION mswud)
-endif()
-find_package(wxWidgets 3.1 REQUIRED COMPONENTS adv base core html qa xml net)
-include(${wxWidgets_USE_FILE})
-# The FindwxWidgets.cmake module does not create an IMPORT target, so hack one together.
-# This makes it easy to add the compile definitions to the lib-strings and lib-strings-utils targets.
-if(NOT TARGET wxWidgets::wxWidgets)
-  add_library(wxWidgets::wxWidgets INTERFACE IMPORTED)
-  target_link_libraries(wxWidgets::wxWidgets INTERFACE ${wxWidgets_LIBRARIES})
-  target_compile_definitions(wxWidgets::wxWidgets INTERFACE ${wxWidgets_DEFINITIONS} ${wxWidgets_DEFINITIONS_DEBUG})
-  if(WIN32)
-    target_compile_definitions(wxWidgets::wxWidgets INTERFACE WXUSINGDLL)
+if(NOT WIN32)
+  set(wxWidgets_CONFIG_OPTIONS --version=3.1)
+  find_package(wxWidgets 3.1 COMPONENTS adv base core html qa xml net)
+  include(${wxWidgets_USE_FILE})
+  # The FindwxWidgets.cmake module does not create an IMPORT target, so hack one together.
+  # This makes it easy to add the compile definitions to the lib-strings and lib-strings-utils targets.
+  if(NOT TARGET wxWidgets::wxWidgets)
+    add_library(wxWidgets::wxWidgets INTERFACE IMPORTED)
+    target_link_libraries(wxWidgets::wxWidgets INTERFACE ${wxWidgets_LIBRARIES})
+    target_compile_definitions(wxWidgets::wxWidgets INTERFACE ${wxWidgets_DEFINITIONS} ${wxWidgets_DEFINITIONS_DEBUG})
+  endif()
+else()
+  find_package(unofficial-wxWidgets COMPONENTS adv base core html qa xml net)
+  if(NOT TARGET wxWidgets::wxWidgets)
+    add_library(wxWidgets::wxWidgets INTERFACE IMPORTED)
+    target_link_libraries(wxWidgets::wxWidgets INTERFACE wx::wxadv wx::wxbase wx::wxcore wx::wxhtml wx::wxqa wx::wxxml wx::wxnet)
   endif()
 endif()
 
