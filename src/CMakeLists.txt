@@ -1032,9 +1032,6 @@ list( APPEND RESOURCES
 list( APPEND DEFINES
    PRIVATE
       BUILDING_AUDACITY
-      WXUSINGDLL
-      ${wxWidgets_DEFINITIONS}
-      $<$<CONFIG:Debug>:${wxWidgets_DEFINITIONS_DEBUG}>
       CMAKE
       $<$<BOOL:${HAVE_LRINT}>:
          HAVE_LRINT
@@ -1079,7 +1076,7 @@ list( APPEND LIBRARIES
    PUBLIC
       ${CMAKE_REQUIRED_LIBRARIES}
       ZLIB::ZLIB
-      ${wxWidgets_LIBRARIES}
+      wxWidgets::wxWidgets
       expat::expat
       mp3lame::mp3lame
       SndFile::sndfile
