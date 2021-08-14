@@ -687,9 +687,13 @@ endif()
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|Windows")
     find_package(GLIB REQUIRED)
     find_package(GTK 3.0 REQUIRED)
+
 endif()
 
 set(wxWidgets_CONFIG_OPTIONS --version=3.1)
+if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(wxWidgets_CONFIGURATION mswud)
+endif()
 find_package(wxWidgets 3.1 REQUIRED COMPONENTS adv base core html qa xml net)
 include(${wxWidgets_USE_FILE})
 # The FindwxWidgets.cmake module does not create an IMPORT target, so hack one together.
